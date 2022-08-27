@@ -12,6 +12,7 @@ from src.constants import (
     FRAME_RATE,
     TARGET_AMOUNT,
     TARGET_SPEED,
+    TARGET_SPEED_DISPERSION,
     WHITE
 )
 
@@ -119,8 +120,8 @@ class SceneManager:
                 self.targets.add(target)
 
                 side = random.choice((1, -1))
-
-                self.movement.append([target, TARGET_SPEED * side])
+                target_speed = random.choice([x for x in range(TARGET_SPEED-TARGET_SPEED_DISPERSION, TARGET_SPEED+TARGET_SPEED_DISPERSION)])
+                self.movement.append([target, target_speed * side])
         
             self.draw = False
 
