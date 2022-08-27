@@ -1,8 +1,8 @@
 import pygame
-import json
 import random
+import json
 
-from typing import Dict
+from typing import Dict, List
 from src.sprites import Target
 from random import randint
 from src.tools import Tools
@@ -10,6 +10,8 @@ from src.tools import Tools
 from src.constants import (
     BLACK,
     FRAME_RATE,
+    TARGET_AMOUNT,
+    TARGET_SPEED,
     WHITE
 )
 
@@ -29,6 +31,8 @@ class SceneManager:
         self.tools = tools
         self.buttons: Dict[str, pygame.Rect] = {}
         self.arrow = pygame.transform.scale(pygame.image.load("assets/arrow.png"), (100, 100))
+        self.movement: List[List[pygame.sprite.Sprite, int]] = []
+        self.player_name = ""
 
     def process_game_interaction(self):
         for event in pygame.event.get():
@@ -84,9 +88,9 @@ class SceneManager:
                 self.buttons[text] = play_button
 
         self.amount = 0
-        self.player_name = ""
         self.time = 10
         self.ticks = 0
+        self.targets.empty()
 
     def name(self):
         self.screen.fill(WHITE)
@@ -107,14 +111,28 @@ class SceneManager:
         self.tools.draw(self.tools.get_text(str(self.time), self.font), (self.screen.get_width() - 80, 20))
 
         if self.draw:
-            for i in range(20):
+            for i in range(TARGET_AMOUNT):
                 target = Target()
                 target.rect.x = random.randint(0, self.screen.get_width()-self.crosshair.get_width())
                 target.rect.y = random.randint(0, self.screen.get_height()-self.crosshair.get_height())
 
                 self.targets.add(target)
+
+                side = random.choice((1, -1))
+
+                self.movement.append([target, TARGET_SPEED * side])
         
             self.draw = False
+
+        for target in self.movement:
+            target[0].rect.x += target[1]
+
+            if target[0].rect.x <= 0:
+                target[1] = TARGET_SPEED
+
+            elif target[0].rect.x >= self.screen.get_width()-target[0].rect.width:
+                target[1] = -TARGET_SPEED
+                
 
         self.targets.draw(self.screen)
 
